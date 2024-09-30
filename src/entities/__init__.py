@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from typing import Mapping, override
+from typing import Mapping, ClassVar, override
 
 from dataclasses import dataclass, field
 from enum import StrEnum
+
+from re import match
 
 from mysql.connector.types import RowItemType
 
@@ -71,7 +73,28 @@ class Student:
     year: int = field(compare=False)
     gender: Gender = field(compare=False)
     program: str = field(compare=False)
+
+    ID_VALID_REGEX: ClassVar[str] = r"^[0-9]{4}-[0-9]{4}$"
+    YEAR_MAX_LEVEL: ClassVar[int] = 8
+
+    def __post_init__(self):
+        if not Student.is_valid_id(self.id):
+            raise ValueError(f"Student ID must follow regex {Student.ID_VALID_REGEX!r}, got {self.id}")
+        
+        if not Student.is_valid_year(self.year):
+            raise ValueError(f"Year must be between 1 and {Student.YEAR_MAX_LEVEL}, got {self.year}")
+
+        if not isinstance(self.gender, Gender):
+            raise ValueError(f"Invalid gender value: {self.gender!r}")
+
+    @staticmethod
+    def is_valid_id(id: str) -> bool:
+        return bool(match(Student.ID_VALID_REGEX, id))
     
+    @staticmethod
+    def is_valid_year(year: int) -> bool:
+        return 1 <= year <= Student.YEAR_MAX_LEVEL
+
     @classmethod
     def from_db_row(cls, row: Mapping[str, RowItemType]) -> Student:
         return cls(
