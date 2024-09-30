@@ -3,13 +3,13 @@ from __future__ import annotations
 from typing import Mapping, ClassVar, override
 
 from dataclasses import dataclass, field
-from enum import StrEnum
+from enum import Enum
 
 from re import match
 
 from mysql.connector.types import RowItemType
 
-class Gender(StrEnum):
+class Gender(Enum):
     MALE = "M"
     FEMALE = "F"
     OTHER = "O"
