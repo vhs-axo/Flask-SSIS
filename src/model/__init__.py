@@ -33,7 +33,8 @@ class SSIS:
     UPDATE_PROGRAM_QUERY = "UPDATE programs SET name = %s, college = %s WHERE code = %s"
     UPDATE_STUDENT_QUERY = "UPDATE students SET firstname = %s, lastname = %s, year = %s, gender = %s, program = %s WHERE id = %s"
 
-    def add_college(self, college: College) -> None:
+    @staticmethod
+    def add_college(college: College) -> None:
         try:
             SSIS.__add_entity(SSIS.INSERT_COLLEGE_QUERY, (
                 college.code, 
@@ -45,7 +46,8 @@ class SSIS:
                 raise CollegeExistsError(college.code)
             raise
 
-    def add_program(self, program: Program) -> None:
+    @staticmethod
+    def add_program(program: Program) -> None:
         try:
             SSIS.__add_entity(SSIS.INSERT_PROGRAM_QUERY, (
                 program.code, 
@@ -58,7 +60,8 @@ class SSIS:
                 raise ProgramExistsError(program.code)
             raise
 
-    def add_student(self, student: Student) -> None:
+    @staticmethod
+    def add_student(student: Student) -> None:
         try:
             SSIS.__add_entity(SSIS.INSERT_STUDENT_QUERY, (
                 student.id, 
@@ -74,7 +77,8 @@ class SSIS:
                 raise StudentExistsError(student.id)
             raise
 
-    def get_college(self, college_code: str) -> Optional[College]:
+    @staticmethod
+    def get_college(college_code: str) -> Optional[College]:
         try:
             return SSIS.__get_entity(SSIS.SELECT_COLLEGE_QUERY, college_code, College)
         
@@ -82,7 +86,8 @@ class SSIS:
             print(f"Error: {e}")
             raise
     
-    def get_program(self, program_code: str) -> Optional[Program]:
+    @staticmethod
+    def get_program(program_code: str) -> Optional[Program]:
         try:
             return SSIS.__get_entity(SSIS.SELECT_PROGRAM_QUERY, program_code, Program)
         
@@ -90,7 +95,8 @@ class SSIS:
             print(f"Error: {e}")
             raise
     
-    def get_student(self, student_id: str) -> Optional[Student]:
+    @staticmethod
+    def get_student(student_id: str) -> Optional[Student]:
         try:
             return SSIS.__get_entity(SSIS.SELECT_STUDENT_QUERY, student_id, Student)
         
@@ -98,7 +104,8 @@ class SSIS:
             print(f"Error: {e}")
             raise
     
-    def get_colleges(self, **filter) -> Iterator[College]:
+    @staticmethod
+    def get_colleges(**filter) -> Iterator[College]:
         try:
             return SSIS.__get_entites(SSIS.SELECT_COLLEGES_QUERY, College)
         
@@ -106,7 +113,8 @@ class SSIS:
             print(f"Error: {e}")
             raise
 
-    def get_programs(self, **filter) -> Iterator[Program]:
+    @staticmethod
+    def get_programs(**filter) -> Iterator[Program]:
         try:
             return SSIS.__get_entites(SSIS.SELECT_PROGRAMS_QUERY, Program)
         
@@ -114,7 +122,8 @@ class SSIS:
             print(f"Error: {e}")
             raise
 
-    def get_students(self, **filter) -> Iterator[Student]:
+    @staticmethod
+    def get_students(**filter) -> Iterator[Student]:
         try:
             return SSIS.__get_entites(SSIS.SELECT_STUDENTS_QUERY, Student)
         
@@ -122,28 +131,32 @@ class SSIS:
             print(f"Error: {e}")
             raise
 
-    def delete_college(self, college_code) -> None:
+    @staticmethod
+    def delete_college(college_code) -> None:
         try:
             SSIS.__delete_entity(SSIS.DELETE_COLLEGE_QUERY, college_code)
         
         except Error as e:
             print(f"Error: {e}")
         
-    def delete_program(self, program_code) -> None:
+    @staticmethod
+    def delete_program(program_code) -> None:
         try:
             SSIS.__delete_entity(SSIS.DELETE_PROGRAM_QUERY, program_code)
         
         except Error as e:
             print(f"Error: {e}")
 
-    def delete_student(self, student_id) -> None:
+    @staticmethod
+    def delete_student(student_id) -> None:
         try:
             SSIS.__delete_entity(SSIS.DELETE_STUDENT_QUERY, student_id)
         
         except Error as e:
             print(f"Error: {e}")
 
-    def edit_college(self, college: College) -> None:
+    @staticmethod
+    def edit_college(college: College) -> None:
         try:
             SSIS.__edit_entity(SSIS.UPDATE_COLLEGE_QUERY, (college.name, college.code))
         
@@ -151,7 +164,8 @@ class SSIS:
             print(f"Error: {e}")
             raise
     
-    def edit_program(self, program: Program) -> None:
+    @staticmethod
+    def edit_program(program: Program) -> None:
         try:
             SSIS.__edit_entity(SSIS.UPDATE_PROGRAM_QUERY, (program.name, program.college, program.code))
         
@@ -159,7 +173,8 @@ class SSIS:
             print(f"Error: {e}")
             raise
 
-    def edit_student(self, student: Student) -> None:
+    @staticmethod
+    def edit_student(student: Student) -> None:
         try:
             SSIS.__edit_entity(SSIS.UPDATE_STUDENT_QUERY, (
                 student.firstname, student.lastname, 
