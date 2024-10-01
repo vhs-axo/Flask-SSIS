@@ -1,5 +1,5 @@
 from flask import Flask
-from config import MYSQL_DB, MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD
+from config import MYSQL_DB, MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, SECRET_KEY
 
 from src.flask_mysql_connector import FlaskMySQLConnector
 
@@ -18,7 +18,8 @@ def create_app() -> Flask:
         MYSQL_USER=MYSQL_USER,
         MYSQL_PASSWORD=MYSQL_PASSWORD,
         MYSQL_DB=MYSQL_DB,
-        MYSQL_HOST=MYSQL_HOST
+        MYSQL_HOST=MYSQL_HOST,
+        SECRET_KEY=SECRET_KEY
     )
 
     # Initialize the MySQL connection
