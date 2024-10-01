@@ -4,9 +4,6 @@ from typing import Iterable
 from flask_wtf import FlaskForm
 from wtforms import StringField, validators, SubmitField, SelectField
 
-from src.entities import Student, Gender
-from src.model import SSIS
-
 class ProgramForm(FlaskForm):
     code = StringField(
         "Program Code", 
