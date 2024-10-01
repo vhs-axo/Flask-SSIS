@@ -4,9 +4,10 @@ from collections.abc import Iterator
 from typing import Optional, TypeVar
 
 from mysql.connector.cursor import MySQLCursorDict
-from mysql.connector import Error
+from mysql.connector import Error, errorcode
 
 from src.entities import College, Program, Student
+from src.model.errors import *
 from src import mysql
 
 T = TypeVar("T", bound=College | Program | Student)
@@ -31,6 +32,47 @@ class SSIS:
     UPDATE_COLLEGE_QUERY = "UPDATE colleges SET name = %s WHERE code = %s"
     UPDATE_PROGRAM_QUERY = "UPDATE programs SET name = %s, college = %s WHERE code = %s"
     UPDATE_STUDENT_QUERY = "UPDATE students SET firstname = %s, lastname = %s, year = %s, gender = %s, program = %s WHERE id = %s"
+
+    def add_college(self, college: College) -> None:
+        try:
+            SSIS.__add_entity(SSIS.INSERT_COLLEGE_QUERY, (
+                college.code, 
+                college.name
+            ))
+        
+        except Error as e:
+            if e.errno == errorcode.ER_DUP_ENTRY:
+                raise CollegeExistsError(college.code)
+            raise
+
+    def add_program(self, program: Program) -> None:
+        try:
+            SSIS.__add_entity(SSIS.INSERT_PROGRAM_QUERY, (
+                program.code, 
+                program.name, 
+                program.college
+            ))
+        
+        except Error as e:
+            if e.errno == errorcode.ER_DUP_ENTRY:
+                raise ProgramExistsError(program.code)
+            raise
+
+    def add_student(self, student: Student) -> None:
+        try:
+            SSIS.__add_entity(SSIS.INSERT_STUDENT_QUERY, (
+                student.id, 
+                student.firstname, 
+                student.lastname, 
+                student.year, 
+                student.gender.value, 
+                student.program
+            ))
+        
+        except Error as e:
+            if e.errno == errorcode.ER_DUP_ENTRY:
+                raise StudentExistsError(student.id)
+            raise
 
     @staticmethod
     def __add_entity(query: str, params: tuple[str | int, ...]) -> None:
