@@ -143,6 +143,34 @@ class SSIS:
         except Error as e:
             print(f"Error: {e}")
 
+    def edit_college(self, college: College) -> None:
+        try:
+            SSIS.__edit_entity(SSIS.UPDATE_COLLEGE_QUERY, (college.name, college.code))
+        
+        except Error as e:
+            print(f"Error: {e}")
+            raise
+    
+    def edit_program(self, program: Program) -> None:
+        try:
+            SSIS.__edit_entity(SSIS.UPDATE_PROGRAM_QUERY, (program.name, program.college, program.code))
+        
+        except Error as e:
+            print(f"Error: {e}")
+            raise
+
+    def edit_student(self, student: Student) -> None:
+        try:
+            SSIS.__edit_entity(SSIS.UPDATE_STUDENT_QUERY, (
+                student.firstname, student.lastname, 
+                student.year, student.gender.value, 
+                student.program, student.id
+            ))
+        
+        except Error as e:
+            print(f"Error: {e}")
+            raise
+
     @staticmethod
     def __add_entity(query: str, params: tuple[str | int, ...]) -> None:
         try:
