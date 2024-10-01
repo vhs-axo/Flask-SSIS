@@ -74,6 +74,54 @@ class SSIS:
                 raise StudentExistsError(student.id)
             raise
 
+    def get_college(self, college_code: str) -> Optional[College]:
+        try:
+            return SSIS.__get_entity(SSIS.SELECT_COLLEGE_QUERY, college_code, College)
+        
+        except Error as e:
+            print(f"Error: {e}")
+            raise
+    
+    def get_program(self, program_code: str) -> Optional[Program]:
+        try:
+            return SSIS.__get_entity(SSIS.SELECT_PROGRAM_QUERY, program_code, Program)
+        
+        except Error as e:
+            print(f"Error: {e}")
+            raise
+    
+    def get_student(self, student_id: str) -> Optional[Student]:
+        try:
+            return SSIS.__get_entity(SSIS.SELECT_STUDENT_QUERY, student_id, Student)
+        
+        except Error as e:
+            print(f"Error: {e}")
+            raise
+    
+    def get_colleges(self, **filter) -> Iterator[College]:
+        try:
+            return SSIS.__get_entites(SSIS.SELECT_COLLEGES_QUERY, College)
+        
+        except Error as e:
+            print(f"Error: {e}")
+            raise
+
+    def get_programs(self, **filter) -> Iterator[Program]:
+        try:
+            return SSIS.__get_entites(SSIS.SELECT_PROGRAMS_QUERY, Program)
+        
+        except Error as e:
+            print(f"Error: {e}")
+            raise
+
+    def get_students(self, **filter) -> Iterator[Student]:
+        try:
+            return SSIS.__get_entites(SSIS.SELECT_STUDENTS_QUERY, Student)
+        
+        except Error as e:
+            print(f"Error: {e}")
+            raise
+
     @staticmethod
     def __add_entity(query: str, params: tuple[str | int, ...]) -> None:
         try:
