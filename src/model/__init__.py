@@ -122,6 +122,27 @@ class SSIS:
             print(f"Error: {e}")
             raise
 
+    def delete_college(self, college_code) -> None:
+        try:
+            SSIS.__delete_entity(SSIS.DELETE_COLLEGE_QUERY, college_code)
+        
+        except Error as e:
+            print(f"Error: {e}")
+        
+    def delete_program(self, program_code) -> None:
+        try:
+            SSIS.__delete_entity(SSIS.DELETE_PROGRAM_QUERY, program_code)
+        
+        except Error as e:
+            print(f"Error: {e}")
+
+    def delete_student(self, student_id) -> None:
+        try:
+            SSIS.__delete_entity(SSIS.DELETE_STUDENT_QUERY, student_id)
+        
+        except Error as e:
+            print(f"Error: {e}")
+
     @staticmethod
     def __add_entity(query: str, params: tuple[str | int, ...]) -> None:
         try:
