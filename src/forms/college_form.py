@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, validators, SubmitField
+from wtforms import Field, StringField, ValidationError, validators, SubmitField
+
+from src.model import SSIS
 
 class CollegeForm(FlaskForm):
     code = StringField(
@@ -17,3 +19,8 @@ class CollegeForm(FlaskForm):
         ]
     )
     save = SubmitField("Save")
+
+    def validate_code(self, field: Field) -> None:
+        """Check if the student ID already exists in the database."""
+        if SSIS.get_college(field.data) is not None:
+            raise ValidationError("A college with this code already exists.")

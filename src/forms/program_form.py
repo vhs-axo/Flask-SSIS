@@ -2,7 +2,9 @@ from __future__ import annotations
 from typing import Iterable
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, validators, SubmitField, SelectField
+from wtforms import Field, StringField, ValidationError, validators, SubmitField, SelectField
+
+from src.model import SSIS
 
 class ProgramForm(FlaskForm):
     code = StringField(
@@ -30,3 +32,8 @@ class ProgramForm(FlaskForm):
         super().__init__(*args, **kwargs)
 
         self.college.choices = college_list # type: ignore
+    
+    def validate_code(self, field: Field) -> None:
+        """Check if the student ID already exists in the database."""
+        if SSIS.get_program(field.data) is not None:
+            raise ValidationError("A program with this code already exists.")

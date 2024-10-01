@@ -60,5 +60,5 @@ class StudentForm(FlaskForm):
     
     def validate_id(self, field: Field) -> None:
         """Check if the student ID already exists in the database."""
-        if SSIS.get_student(field.data):
+        if SSIS.get_student(field.data) is not None:
             raise ValidationError("A student with this ID already exists.")
