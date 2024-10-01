@@ -1,6 +1,8 @@
 from flask import Flask
 from config import MYSQL_DB, MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, SECRET_KEY
 
+from flask_wtf.csrf import CSRFProtect
+
 from src.flask_mysql_connector import FlaskMySQLConnector
 
 mysql = FlaskMySQLConnector()
@@ -24,6 +26,8 @@ def create_app() -> Flask:
 
     # Initialize the MySQL connection
     mysql.init_app(app)
+
+    CSRFProtect(app)
 
     # Return the Flask application instance
     return app
