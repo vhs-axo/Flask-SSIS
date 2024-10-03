@@ -1,0 +1,86 @@
+<div class="mt-4">
+    <!-- Button to open the "Add College" form modal -->
+    <button class="btn btn-success mb-3" onclick="showCollegeForm('add')">Add New College</button>
+
+    <!-- Colleges Table -->
+    <table class="table table-bordered table-striped text-center">
+        <thead class="thead-dark">
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for college in colleges %}
+            <tr>
+                <td>{{ college.code }}</td>
+                <td>{{ college.name }}</td>
+                <td>
+                    <button class="btn btn-sm btn-warning" onclick="showCollegeForm('edit', '{{ college.code }}', '{{ college.name }}')">Edit</button>
+                    <form action="{{ url_for('colleges.delete_college') }}" method="POST" style="display:inline;">
+                        {{ college_form.hidden_tag() }}
+                        <input type="hidden" name="code" value="{{ college.code }}">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this college?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal for Adding/Editing Colleges -->
+<div class="modal fade" id="collegeFormModal" tabindex="-1" role="dialog" aria-labelledby="collegeFormModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-bottom" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="collegeFormModalLabel">Add/Edit College</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- College Flask-WTF Form -->
+                <form method="POST" id="collegeForm">
+                    {{ college_form.hidden_tag() }}
+                    <div class="form-group">
+                        {{ college_form.code.label(class="form-control-label") }}
+                        {{ college_form.code(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ college_form.name.label(class="form-control-label") }}
+                        {{ college_form.name(class="form-control") }}
+                    </div>
+                    <button type="button" class="btn btn-primary" id="saveCollegeButton">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Modal Form Handling -->
+<script>
+    function showCollegeForm(action, code='', name='') {
+        $('#collegeFormModal').modal('show');
+
+        const form = document.getElementById('collegeForm');
+
+        if (action === 'add') {
+            form.action = "{{ url_for('colleges.add_college') }}";
+            document.getElementById('collegeFormModalLabel').innerText = 'Add College';
+
+            // Clear form fields for adding
+            form.code.value = '';
+            form.name.value = '';
+
+        } else if (action === 'edit') {
+            form.action = `/edit_college/${code}`;
+            document.getElementById('collegeFormModalLabel').innerText = 'Edit College';
+
+            // Populate form fields with existing data
+            form.code.value = code;
+            form.name.value = name;
+        }
+    }
+</script>
