@@ -21,9 +21,9 @@ class SSIS:
     SELECT_PROGRAM_QUERY = "SELECT * FROM programs WHERE code = %s"
     SELECT_STUDENT_QUERY = "SELECT * FROM students WHERE id = %s"
 
-    SELECT_COLLEGES_QUERY = "SELECT * FROM colleges ORDER BY code"
-    SELECT_PROGRAMS_QUERY = "SELECT * FROM programs ORDER BY code"
-    SELECT_STUDENTS_QUERY = "SELECT * FROM students ORDER BY id"
+    SELECT_COLLEGES_QUERY = "SELECT * FROM colleges"
+    SELECT_PROGRAMS_QUERY = "SELECT * FROM programs"
+    SELECT_STUDENTS_QUERY = "SELECT * FROM students"
 
     DELETE_COLLEGE_QUERY = "DELETE FROM colleges WHERE code = %s"
     DELETE_PROGRAM_QUERY = "DELETE FROM programs WHERE code = %s"
@@ -107,7 +107,22 @@ class SSIS:
     @staticmethod
     def get_colleges(**filter) -> Iterator[College]:
         try:
-            return SSIS.__get_entites(SSIS.SELECT_COLLEGES_QUERY, College)
+            query = SSIS.SELECT_COLLEGES_QUERY
+
+            # Build dynamic WHERE clause based on provided filters
+            if filter:
+                params = []
+                conditions = []
+
+                for column, value in filter.items():
+                    conditions.append(f"{column} LIKE %s")
+                    params.append(f"%{value}%")
+
+                query += " WHERE " + " OR ".join(conditions)
+                
+                return SSIS.__get_entites(f"{query} ORDER BY id", College, tuple(params))
+
+            return SSIS.__get_entites(f"{query} ORDER BY id", College)
         
         except Error as e:
             print(f"Error: {e}")
@@ -116,7 +131,22 @@ class SSIS:
     @staticmethod
     def get_programs(**filter) -> Iterator[Program]:
         try:
-            return SSIS.__get_entites(SSIS.SELECT_PROGRAMS_QUERY, Program)
+            query = SSIS.SELECT_PROGRAMS_QUERY
+
+            # Build dynamic WHERE clause based on provided filters
+            if filter:
+                params = []
+                conditions = []
+
+                for column, value in filter.items():
+                    conditions.append(f"{column} LIKE %s")
+                    params.append(f"%{value}%")
+
+                query += " WHERE " + " OR ".join(conditions)
+
+                return SSIS.__get_entites(f"{query} ORDER BY code", Program, tuple(params))
+
+            return SSIS.__get_entites(f"{query} ORDER BY code", Program)
         
         except Error as e:
             print(f"Error: {e}")
@@ -125,7 +155,22 @@ class SSIS:
     @staticmethod
     def get_students(**filter) -> Iterator[Student]:
         try:
-            return SSIS.__get_entites(SSIS.SELECT_STUDENTS_QUERY, Student)
+            query = SSIS.SELECT_STUDENTS_QUERY
+
+            # Build dynamic WHERE clause based on provided filters
+            if filter:
+                params = []
+                conditions = []
+
+                for column, value in filter.items():
+                    conditions.append(f"{column} LIKE %s")
+                    params.append(f"%{value}%")
+
+                query += " WHERE " + " OR ".join(conditions)
+
+                return SSIS.__get_entites(f"{query} ORDER BY id", Student, tuple(params))
+
+            return SSIS.__get_entites(f"{query} ORDER BY id", Student)
         
         except Error as e:
             print(f"Error: {e}")
@@ -213,11 +258,14 @@ class SSIS:
             raise
     
     @staticmethod
-    def __get_entites(query: str, return_type: type[T]) -> Iterator[T]:
+    def __get_entites(query: str, return_type: type[T], params: Optional[tuple] = None) -> Iterator[T]:
         try:
             cursor: MySQLCursorDict
-            with mysql.connection.cursor(dictionary=True) as cursor: # type: ignore
-                cursor.execute(query)
+            with mysql.connection.cursor(dictionary=True) as cursor:  # type: ignore
+                if params is None:
+                    cursor.execute(query)
+                else:
+                    cursor.execute(query, params)
 
                 return (return_type.from_db_row(row) for row in cursor.fetchall() if row is not None)
         

@@ -1,4 +1,10 @@
 <div class="mt-4">
+    <!-- Search Bar for Filtering Programs -->
+    <form method="GET" action="{{ url_for('programs.load_programs') }}" class="form-inline mb-3">
+        <input type="text" name="search" class="form-control mr-2" placeholder="Search by Program Code">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    
     <!-- Button to open the "Add Program" form modal -->
     <button class="btn btn-success mb-3" onclick="showProgramForm('add')">Add New Program</button>
 
@@ -21,6 +27,7 @@
                 <td>
                     <button class="btn btn-sm btn-warning" onclick="showProgramForm('edit', '{{ program.code }}', '{{ program.name }}', '{{ program.college }}')">Edit</button>
                     <form action="{{ url_for('programs.delete_program') }}" method="POST" style="display:inline;">
+                        {{ program_form.hidden_tag() }}
                         <input type="hidden" name="code" value="{{ program.code }}">
                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this program?')">Delete</button>
                     </form>

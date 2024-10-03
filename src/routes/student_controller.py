@@ -8,14 +8,15 @@ students_bp = Blueprint("students", __name__)
 
 @students_bp.route('', methods=['GET'])
 def load_students():
-    """
-    Route to render the students content along with the StudentForm.
-    This is used as the AJAX endpoint for loading the student list in the tab.
-    """
-    print("Loading students...")
+    """Load the students content with an optional search filter."""
+    # Get the search query from the request arguments
+    search_query = request.args.get("search", "", type=str).strip()
 
-    # Fetch the list of students from the SSIS model
-    students = list(SSIS.get_students())
+    # Fetch students based on the search query if provided, otherwise get all students
+    if search_query:
+        students = list(SSIS.get_students(id=search_query))  # Search by student ID only
+    else:
+        students = list(SSIS.get_students())
 
     # Fetch programs to populate the StudentForm's program dropdown choices
     program_choices = [(program.code, program.name) for program in SSIS.get_programs()]
@@ -97,10 +98,13 @@ def delete_student() -> Response:
     Returns a JSON response indicating success or failure.
     """
     student_id = request.form.get('id')
+    
     if student_id is not None:
         try:
             SSIS.delete_student(student_id)
-            return jsonify(success=True, message="Student deleted successfully")
+            flash("Student deleted successfully", "success")
+        
         except Exception as e:
-            return jsonify(success=False, message=f"Failed to delete student: {e}")
-    return jsonify(success=False, message="Invalid student ID provided")
+            flash(f"Failed to delete student\nError: {e}", "danger")
+    
+    return redirect(url_for('students.load_colleges'))
