@@ -57,7 +57,7 @@ def add_student():
         SSIS.add_student(new_student)
         
         # Return JSON response for AJAX success handling
-        return jsonify(success=True, message="College added successfully!")
+        return jsonify(success=True, message="Student added successfully!")
 
     # Return error message if form validation fails
     return jsonify(success=False, message=f"Student {str(form.id.data)} already exists!")
