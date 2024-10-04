@@ -53,7 +53,7 @@ def add_program():
 
 
 @programs_bp.route('/edit', methods=['POST'])
-def edit_program(program_code) -> Response:
+def edit_program() -> Response:
     """
     Handle form submission for editing an existing program.
     """
@@ -61,7 +61,7 @@ def edit_program(program_code) -> Response:
     
     form = ProgramForm(college_list=college_choices, formdata=request.form)
     
-    program = SSIS.get_program(program_code)
+    program = SSIS.get_program(str(form.code.data))
     if program:
         # Update the program with form data
         program.name = form.name.data
