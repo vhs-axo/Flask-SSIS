@@ -120,9 +120,9 @@ class SSIS:
 
                 query += " WHERE " + " OR ".join(conditions)
                 
-                return SSIS.__get_entites(f"{query} ORDER BY id", College, tuple(params))
+                return SSIS.__get_entites(f"{query} ORDER BY code", College, tuple(params))
 
-            return SSIS.__get_entites(f"{query} ORDER BY id", College)
+            return SSIS.__get_entites(f"{query} ORDER BY code", College)
         
         except Error as e:
             print(f"Error: {e}")
