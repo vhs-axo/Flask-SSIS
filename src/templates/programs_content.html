@@ -1,6 +1,6 @@
 <div class="mt-4">
     <!-- Search Bar for Filtering Programs -->
-    <form method="GET" action="{{ url_for('programs.load_programs') }}" class="form-inline mb-3">
+    <form id="programSearchForm" method="GET" action="{{ url_for('programs.load_programs') }}" class="form-inline mb-3">
         <input type="text" name="search" class="form-control mr-2" placeholder="Search by Program Code">
         <button type="submit" class="btn btn-primary">Search</button>
     </form>
@@ -26,10 +26,10 @@
                 <td>{{ program.college }}</td>
                 <td>
                     <button class="btn btn-sm btn-warning" onclick="showProgramForm('edit', '{{ program.code }}', '{{ program.name }}', '{{ program.college }}')">Edit</button>
-                    <form action="{{ url_for('programs.delete_program') }}" method="POST" style="display:inline;">
+                    <form class="delete-program-form" action="{{ url_for('programs.delete_program') }}" method="POST" style="display:inline;">
                         {{ program_form.hidden_tag() }}
                         <input type="hidden" name="code" value="{{ program.code }}">
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this program?')">Delete</button>
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this program? This action will also delete all students under this program.')">Delete</button>
                     </form>
                 </td>
             </tr>
@@ -64,7 +64,7 @@
                         {{ program_form.college.label(class="form-control-label") }}
                         {{ program_form.college(class="form-control") }}
                     </div>
-                    <button type="button" class="btn btn-primary" id="saveProgramButton">Save</button>
+                    <button type="submit" action="{{ url_for('programs.load_programs') }}" class="btn btn-primary" id="saveProgramButton">Save</button>
                 </form>
             </div>
         </div>
@@ -88,13 +88,111 @@
             form.college.value = '';
 
         } else if (action === 'edit') {
-            form.action = `/edit_program/${code}`;
+            form.action = `{{ url_for('programs.edit_program') }}`;
             document.getElementById('programFormModalLabel').innerText = 'Edit Program';
 
             // Populate form fields with existing data
             form.code.value = code;
             form.name.value = name;
             form.college.value = college;
+
+            const codeField = document.getElementById('programForm').code;
+            codeField.readOnly = true;
         }
     }
+    
+    // Handle the search form submission using AJAX
+    $(document).on('submit', '#programSearchForm', function(e) {
+        e.preventDefault();  // Prevent the default form submission
+
+        var form = $(this);
+
+        $.ajax({
+            type: 'GET',
+            url: form.attr('action'),  // Use the form's action attribute (URL for searching)
+            data: form.serialize(),  // Serialize form data for AJAX
+            success: function(response) {
+                // Replace the colleges table with the updated content
+                $('#programs-content').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error during search submission:", error);
+                alert("Failed to search. Error: " + error);
+            }
+        });
+    });
+
+    // Handle the program form submission for adding or editing
+    $(document).on('submit', '#programForm', function(e) {
+        e.preventDefault();  // Prevent the default form submission
+
+        var form = $(this);
+        var url = form.attr('action');  // Get the URL from the form's action attribute
+
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: form.serialize(),  // Serialize form data for AJAX submission
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    $('#programFormModal').modal('hide');  // Hide the modal after successful submission
+                    $('.modal-backdrop').remove();
+                    loadPrograms();  // Function to reload the programs table
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Failed to submit form. Error: ' + error);
+            }
+        });
+    });
+
+    $('#programFormModal').on('hidden.bs.modal', function () {
+        // Reset form fields when the modal is hidden
+        $('#programForm')[0].reset();  // Reset form fields
+        const codeField = document.getElementById('programForm').code;
+        codeField.readOnly = false;  // Ensure code field is editable when the modal is closed
+    });
+
+
+    // Function to dynamically load and refresh the programs table
+    function loadPrograms() {
+        console.log("Loading programs table...");
+        $.ajax({
+            url: '/programs',
+            type: 'GET',
+            success: function (response) {
+                $('#programs-content').html(response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading content for " + targetTab + ": " + error);
+            }
+        });
+    }
+
+    // Handle the delete button click event
+    $(document).on('submit', '.delete-program-form', function(e) {
+        e.preventDefault();  // Prevent the default form submission
+
+        var form = $(this);
+        $.ajax({
+            type: 'POST',
+            url: form.attr('action'),  // Get the URL from the form's action attribute
+            data: form.serialize(),  // Serialize form data for AJAX submission
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    loadPrograms();  // Refresh the programs table
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error during form submission:", error);
+                alert("Failed to submit form. Error: " + error);
+            }
+        });
+    });
 </script>

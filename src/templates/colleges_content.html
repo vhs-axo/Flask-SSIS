@@ -1,6 +1,6 @@
-<div class="mt-4">
+<div class="mt-4" id="collegesTable">
     <!-- Search Bar for Filtering Colleges -->
-    <form method="GET" action="{{ url_for('colleges.load_colleges') }}" class="form-inline mb-3">
+    <form id="collegeSearchForm" method="GET" action="{{ url_for('colleges.load_colleges') }}" class="form-inline mb-3">
         <input type="text" name="search" class="form-control mr-2" placeholder="Search by Code or Name">
         <button type="submit" class="btn btn-primary">Search</button>
     </form>
@@ -24,10 +24,10 @@
                 <td>{{ college.name }}</td>
                 <td>
                     <button class="btn btn-sm btn-warning" onclick="showCollegeForm('edit', '{{ college.code }}', '{{ college.name }}')">Edit</button>
-                    <form action="{{ url_for('colleges.delete_college') }}" method="POST" style="display:inline;">
+                    <form class="delete-college-form" action="{{ url_for('colleges.delete_college') }}" method="POST" style="display:inline;">
                         {{ college_form.hidden_tag() }}
                         <input type="hidden" name="code" value="{{ college.code }}">
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this college?')">Delete</button>
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this college? This will also delete every program and student under it.')">Delete</button>
                     </form>
                 </td>
             </tr>
@@ -58,7 +58,7 @@
                         {{ college_form.name.label(class="form-control-label") }}
                         {{ college_form.name(class="form-control") }}
                     </div>
-                    <button type="button" class="btn btn-primary" id="saveCollegeButton">Save</button>
+                    <button type="submit" action="{{ url_for('colleges.load_colleges') }}" class="btn btn-primary" id="saveCollegeButton">Save</button>
                 </form>
             </div>
         </div>
@@ -81,12 +81,110 @@
             form.name.value = '';
 
         } else if (action === 'edit') {
-            form.action = `/edit_college/${code}`;
+            form.action = `{{ url_for('colleges.edit_college') }}`;
             document.getElementById('collegeFormModalLabel').innerText = 'Edit College';
 
             // Populate form fields with existing data
             form.code.value = code;
             form.name.value = name;
+            
+            const codeField = document.getElementById('collegeForm').code;
+            codeField.readOnly = true;
         }
     }
+    
+    // Handle the search form submission using AJAX
+    $(document).on('submit', '#collegeSearchForm', function(e) {
+        e.preventDefault();  // Prevent the default form submission
+
+        var form = $(this);
+
+        $.ajax({
+            type: 'GET',
+            url: form.attr('action'),  // Use the form's action attribute (URL for searching)
+            data: form.serialize(),  // Serialize form data for AJAX
+            success: function(response) {
+                // Replace the colleges table with the updated content
+                $('#colleges-content').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error during search submission:", error);
+                alert("Failed to search. Error: " + error);
+            }
+        });
+    });
+
+    // Handle the college form submission for adding or editing
+    $(document).on('submit', '#collegeForm', function(e) {
+        e.preventDefault();  // Prevent the default form submission
+
+        var form = $(this);
+        var url = form.attr('action');  // Get the URL from the form's action attribute
+
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: form.serialize(),  // Serialize form data for AJAX submission
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    $('#collegeFormModal').modal('hide');  // Hide the modal after successful submission
+                    $('.modal-backdrop').remove();
+                    loadColleges();  // Function to reload the colleges table (to be defined)
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Failed to submit form. Error: ' + error);
+            }
+        });
+    });
+
+    $('#collegeFormModal').on('hidden.bs.modal', function () {
+        // Reset form fields when the modal is hidden
+        $('#collegeForm')[0].reset();  // Reset form fields
+        const codeField = document.getElementById('collegeForm').code;
+        codeField.readOnly = false;  // Ensure code field is editable when the modal is closed
+    });
+
+
+    // Function to dynamically load and refresh the colleges table
+    function loadColleges() {
+        console.log("Loading colleges table...");
+        $.ajax({
+            url: '/colleges',
+            type: 'GET',
+            success: function (response) {
+                $('#colleges-content').html(response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error loading content for " + targetTab + ": " + error);
+            }
+        });
+    }
+
+    // Handle the delete button click event
+    $(document).on('submit', '.delete-college-form', function(e) {
+        e.preventDefault();  // Prevent the default form submission
+
+        var form = $(this);
+        $.ajax({
+            type: 'POST',
+            url: form.attr('action'),  // Get the URL from the form's action attribute
+            data: form.serialize(),  // Serialize form data for AJAX submission
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    loadColleges();  // Refresh the colleges table
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error during form submission:", error);
+                alert("Failed to submit form. Error: " + error);
+            }
+        });
+    });
 </script>
