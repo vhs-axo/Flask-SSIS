@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, flash
+from flask import Blueprint, jsonify, render_template, request
 from werkzeug import Response
 from src.forms import StudentForm
-from src.entities import Student, Gender
+from src.entities import Student
 from src.model import SSIS
+from src.routes import iterator_is_empty
 
 students_bp = Blueprint("students", __name__)
 
@@ -16,13 +17,13 @@ def load_students():
 
     # Fetch students based on the search query if provided, otherwise get all students
     if search_query:
-        students = SSIS.get_students(
+        students, is_empty = iterator_is_empty(SSIS.get_students(
             id=search_query, firstname=search_query, 
             lastname=search_query, year=search_query, 
             gender=search_query, program=search_query
-        )
+        ))
     else:
-        students = SSIS.get_students()
+        students, is_empty = iterator_is_empty(SSIS.get_students())
 
     # Fetch programs to populate the StudentForm's program dropdown choices
     program_choices = [(program.code, program.name) for program in SSIS.get_programs()]
@@ -30,7 +31,7 @@ def load_students():
     # Create a StudentForm instance with dynamic program choices
     student_form = StudentForm(program_list=program_choices)
 
-    return render_template('students_content.html', students=students, student_form=student_form)
+    return render_template('students_content.html', students=students, student_form=student_form, is_empty=is_empty)
 
 
 @students_bp.route('/add', methods=['POST'])

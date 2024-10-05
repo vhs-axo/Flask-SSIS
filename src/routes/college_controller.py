@@ -3,6 +3,7 @@ from werkzeug import Response
 from src.forms import CollegeForm
 from src.entities import College
 from src.model import SSIS
+from src.routes import iterator_is_empty
 
 colleges_bp = Blueprint("colleges", __name__)
 
@@ -16,13 +17,13 @@ def load_colleges() -> str:
 
     # Fetch colleges based on the search query if provided
     if search_query:
-        colleges = SSIS.get_colleges(code=search_query, name=search_query)
+        colleges, is_empty = iterator_is_empty(SSIS.get_colleges(code=search_query, name=search_query))
     else:
-        colleges = SSIS.get_colleges()  # Fetch all colleges if no search query
+        colleges, is_empty = iterator_is_empty(SSIS.get_colleges())  # Fetch all colleges if no search query
 
     # Create a form instance for use in the modal
     college_form = CollegeForm()
-    return render_template('colleges_content.html', colleges=colleges, college_form=college_form)
+    return render_template('colleges_content.html', colleges=colleges, college_form=college_form, is_empty=is_empty)
 
 
 @colleges_bp.route('/add', methods=['POST'])

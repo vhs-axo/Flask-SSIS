@@ -3,6 +3,7 @@ from werkzeug import Response
 from src.forms import ProgramForm
 from src.entities import Program
 from src.model import SSIS
+from src.routes import iterator_is_empty
 
 programs_bp = Blueprint("programs", __name__)
 
@@ -16,9 +17,9 @@ def load_programs():
 
     # Fetch students based on the search query if provided, otherwise get all students
     if search_query:
-        programs = SSIS.get_programs(code=search_query, name=search_query, college=search_query)  # Search by student ID only
+        programs, is_empty = iterator_is_empty(SSIS.get_programs(code=search_query, name=search_query, college=search_query))  # Search by student ID only
     else:
-        programs = SSIS.get_programs()
+        programs, is_empty = iterator_is_empty(SSIS.get_programs())
 
     # Fetch colleges to populate the ProgramForm's college dropdown choices
     college_choices = [(college.code, college.name) for college in SSIS.get_colleges()]
@@ -26,7 +27,7 @@ def load_programs():
     # Create a ProgramForm instance with dynamic college choices
     program_form = ProgramForm(college_list=college_choices)
 
-    return render_template('programs_content.html', programs=programs, program_form=program_form)
+    return render_template('programs_content.html', programs=programs, program_form=program_form, is_empty=is_empty)
 
 
 @programs_bp.route('/add', methods=['POST'])
