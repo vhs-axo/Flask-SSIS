@@ -59,9 +59,15 @@ def add_student():
         
         # Return JSON response for AJAX success handling
         return jsonify(success=True, message="Student added successfully!")
+    
+    # If validation fails, gather the error messages
+    error_messages = []
+    for field, errors in form.errors.items():
+        for error in errors:
+            error_messages.append(f"{field}: {error}")
 
-    # Return error message if form validation fails
-    return jsonify(success=False, message=f"Student {str(form.id.data)} already exists!")
+    # Return a JSON response with validation errors
+    return jsonify(success=False, message="Validation errors: " + ", ".join(error_messages))
 
 
 @students_bp.route('/edit', methods=['POST'])
