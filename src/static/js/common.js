@@ -78,6 +78,12 @@ $(document).ready(function () {
             codeField.readOnly = false;  // Ensure code field is editable when the modal is closed
         }
     });
+
+    document.addEventListener('input', function(event) {
+        if (event.target.tagName === 'INPUT' && event.target.hasAttribute('autocapitalize')) {
+            event.target.value = event.target.value.toUpperCase();
+        }
+    });
 });
 
 // Function to dynamically load content for a specific entity

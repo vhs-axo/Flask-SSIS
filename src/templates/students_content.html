@@ -11,7 +11,7 @@
                 <option value="gender" {% if search_field == "gender" %}selected{% endif %}>Gender</option>
                 <option value="program" {% if search_field == "program" %}selected{% endif %}>Program Code</option>
             </select>
-            <input type="text" name="search" class="form-control mr-2" placeholder="Search Students" value="{{ search_query }}">
+            <input type="text" name="search" class="form-control mr-2" autocapitalize="characters"  placeholder="Search Students" value="{{ search_query }}">
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
         
@@ -88,11 +88,11 @@
                     </div>
                     <div class="form-group">
                         {{ student_form.firstname.label(class="form-control-label") }}
-                        {{ student_form.firstname(class="form-control") }}
+                        {{ student_form.firstname(class="form-control", autocapitalize="characters" ) }}
                     </div>
                     <div class="form-group">
                         {{ student_form.lastname.label(class="form-control-label") }}
-                        {{ student_form.lastname(class="form-control") }}
+                        {{ student_form.lastname(class="form-control", autocapitalize="characters" ) }}
                     </div>
                     <div class="form-group d-flex justify-content-between">
                         <div>

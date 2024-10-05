@@ -9,7 +9,7 @@
                 <option value="name" {% if search_field == "name" %}selected{% endif %}>Name</option>
                 <option value="college" {% if search_field == "college" %}selected{% endif %}>College Code</option>
             </select>
-            <input type="text" name="search" class="form-control mr-2" placeholder="Search", value="{{ search_query }}">
+            <input type="text" name="search" class="form-control mr-2" autocapitalize="characters"  placeholder="Search", value="{{ search_query }}">
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
         
@@ -65,11 +65,11 @@
                     {{ program_form.hidden_tag() }}
                     <div class="form-group">
                         {{ program_form.code.label(class="form-control-label") }}
-                        {{ program_form.code(class="form-control") }}
+                        {{ program_form.code(class="form-control", autocapitalize="characters" ) }}
                     </div>
                     <div class="form-group">
                         {{ program_form.name.label(class="form-control-label") }}
-                        {{ program_form.name(class="form-control") }}
+                        {{ program_form.name(class="form-control", autocapitalize="characters" ) }}
                     </div>
                     <div class="form-group">
                         {{ program_form.college.label(class="form-control-label") }}
