@@ -2,13 +2,21 @@
     <!-- Container with flexbox utilities for alignment -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <!-- Search Bar for Filtering Students -->
-        <form id="searchForm" method="GET" action="{{ url_for('students.load_students') }}" class="form-inline mb-3" data-entity="students">
-            <input type="text" name="search" class="form-control mr-2" placeholder="Search by ID, Name, or Year">
+        <form id="searchForm" method="GET" action="{{ url_for('students.load_students') }}" class="form-inline" data-entity="students">
+            <!-- Dropdown for selecting the field to search by -->
+            <select name="field" class="form-control mr-2">
+                <option value="id" {% if search_field == "id" %}selected{% endif %}>ID</option>
+                <option value="name" {% if search_field == "name" %}selected{% endif %}>Name</option>
+                <option value="year" {% if search_field == "year" %}selected{% endif %}>Year</option>
+                <option value="gender" {% if search_field == "gender" %}selected{% endif %}>Gender</option>
+                <option value="program" {% if search_field == "program" %}selected{% endif %}>Program Code</option>
+            </select>
+            <input type="text" name="search" class="form-control mr-2" placeholder="Search Students" value="{{ search_query }}">
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
         
         <!-- Button to open the "Add Student" form modal -->
-        <button class="btn btn-success mb-3" onclick="showStudentForm('add')">Add New Student</button>
+        <button class="btn btn-success" onclick="showStudentForm('add')">Add New Student</button>
     </div>
 
     <!-- Students Table -->

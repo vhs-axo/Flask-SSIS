@@ -12,18 +12,27 @@ def load_colleges() -> str:
     """
     Load the colleges content with an optional search filter.
     """
-    # Get the search query from the request arguments
+    # Get the search query and field from the request arguments
     search_query = request.args.get("search", "", type=str).strip().upper()
+    search_field = request.args.get("field", "code", type=str).strip().lower()
 
-    # Fetch colleges based on the search query if provided
-    if search_query:
-        colleges, is_empty = iterator_is_empty(SSIS.get_colleges(code=search_query, name=search_query))
+    # Fetch colleges based on the search query and selected field if provided
+    if search_query and search_field in ["code", "name"]:
+        filter_kwargs = {search_field: search_query}  # Create a dynamic filter using the selected field
+        colleges, is_empty = iterator_is_empty(SSIS.get_colleges(**filter_kwargs))
     else:
         colleges, is_empty = iterator_is_empty(SSIS.get_colleges())  # Fetch all colleges if no search query
 
     # Create a form instance for use in the modal
     college_form = CollegeForm()
-    return render_template('colleges_content.html', colleges=colleges, college_form=college_form, is_empty=is_empty)
+    return render_template(
+        'colleges_content.html', 
+        colleges=colleges, 
+        college_form=college_form, 
+        is_empty=is_empty, 
+        search_query=search_query,
+        search_field=search_field
+    )
 
 
 @colleges_bp.route('/add', methods=['POST'])
@@ -34,8 +43,8 @@ def add_college() -> Response:
     form = CollegeForm()
     if form.validate_on_submit():
         new_college = College(
-            code=form.code.data,
-            name=form.name.data,
+            code=form.code.data.upper(),
+            name=form.name.data.upper(),
         )
         
         SSIS.add_college(new_college)
@@ -57,7 +66,7 @@ def edit_college() -> Response:
     college = SSIS.get_college(str(form.code.data))
     if college:
         # Update the college with form data
-        college.name = form.name.data
+        college.name = form.name.data.upper()
         
         try:
             SSIS.edit_college(college)

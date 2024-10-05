@@ -2,8 +2,14 @@
     <!-- Container with flexbox utilities for alignment -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <!-- Search Bar for Filtering Programs -->
-        <form id="searchForm" method="GET" action="{{ url_for('programs.load_programs') }}" class="form-inline mb-3" data-entity="programs">
-            <input type="text" name="search" class="form-control mr-2" placeholder="Search by Code or Name">
+        <form id="searchForm" method="GET" action="{{ url_for('programs.load_programs') }}" class="form-inline" data-entity="programs">
+            <!-- Dropdown for selecting the field to search by -->
+            <select name="field" class="form-control mr-2">
+                <option value="code" {% if search_field == "code" %}selected{% endif %}>Code</option>
+                <option value="name" {% if search_field == "name" %}selected{% endif %}>Name</option>
+                <option value="college" {% if search_field == "college" %}selected{% endif %}>College Code</option>
+            </select>
+            <input type="text" name="search" class="form-control mr-2" placeholder="Search", value="{{ search_query }}">
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
         
@@ -33,7 +39,7 @@
                         <form class="delete-form" action="{{ url_for('programs.delete_program') }}" method="POST" style="display:inline;" data-entity="programs">
                             {{ program_form.hidden_tag() }}
                             <input type="hidden" name="code" value="{{ program.code }}">
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this program? This action will also delete all students under this program.')">Delete</button>
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this program? This action will unenroll all students under this program.')">Delete</button>
                         </form>
                     </td>
                 </tr>

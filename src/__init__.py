@@ -33,11 +33,8 @@ def create_app() -> Flask:
     from .routes import students_bp, programs_bp, colleges_bp
     # Register Blueprints
     app.register_blueprint(students_bp, url_prefix='/students')  # URL prefix for students
-    print("Loading students...")
     app.register_blueprint(programs_bp, url_prefix='/programs')  # URL prefix for programs
-    print("Loading students...")
     app.register_blueprint(colleges_bp, url_prefix='/colleges')  # URL prefix for colleges
-    print("Loading students...")
 
     # Register any other Blueprints or route modules here as needed
 

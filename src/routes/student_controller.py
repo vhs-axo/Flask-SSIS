@@ -12,16 +12,22 @@ def load_students():
     """
     Load the students content with an optional search filter.
     """
-    # Get the search query from the request arguments
+    # Get the search query and field from the request arguments
     search_query = request.args.get("search", "", type=str).strip().upper()
+    search_field = request.args.get("field", "id", type=str).strip().lower()
 
-    # Fetch students based on the search query if provided, otherwise get all students
-    if search_query:
-        students, is_empty = iterator_is_empty(SSIS.get_students(
-            id=search_query, firstname=search_query, 
-            lastname=search_query, year=search_query, 
-            gender=search_query, program=search_query
-        ))
+    # Fetch students based on the search query and selected field if provided
+    if search_query and search_field in ["id", "name", "year", "gender", "program"]:
+        match search_field:
+            case "id" | "year" | "program":
+                filter_kwargs = {search_field: search_query}
+            case "name":
+                filter_kwargs = {"firstname": search_query, "lastname": search_query}
+            case "gender":
+                filter_kwargs = {"gender": {"MALE": "M", "FEMALE": "F", "OTHER": "O"}.get(search_query, "_")}
+        
+        students, is_empty = iterator_is_empty(SSIS.get_students(**filter_kwargs))
+    
     else:
         students, is_empty = iterator_is_empty(SSIS.get_students())
 
@@ -31,7 +37,14 @@ def load_students():
     # Create a StudentForm instance with dynamic program choices
     student_form = StudentForm(program_list=program_choices)
 
-    return render_template('students_content.html', students=students, student_form=student_form, is_empty=is_empty)
+    return render_template(
+        'students_content.html',
+        students=students, 
+        student_form=student_form, 
+        is_empty=is_empty,
+        search_query=search_query,
+        search_field=search_field
+    )
 
 
 @students_bp.route('/add', methods=['POST'])
@@ -48,8 +61,8 @@ def add_student():
         # Create a new Student instance with the form data
         new_student = Student(
             id=form.id.data,
-            firstname=form.firstname.data,
-            lastname=form.lastname.data,
+            firstname=form.firstname.data.upper(),
+            lastname=form.lastname.data.upper(),
             year=form.year.data,
             gender=form.gender.data,
             program=form.program.data
@@ -83,8 +96,8 @@ def edit_student():
     student = SSIS.get_student(str(form.id.data))
     if student:
         # Update the student with the new form data
-        student.firstname = form.firstname.data
-        student.lastname = form.lastname.data
+        student.firstname = form.firstname.data.upper()
+        student.lastname = form.lastname.data.upper()
         student.year = form.year.data
         student.gender = form.gender.data
         student.program = form.program.data

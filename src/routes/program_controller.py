@@ -12,12 +12,14 @@ def load_programs():
     """
     Load the programs content with an optional search filter.
     """
-    # Get the search query from the request arguments
+    # Get the search query and field from the request arguments
     search_query = request.args.get("search", "", type=str).strip().upper()
+    search_field = request.args.get("field", "code", type=str).strip().lower()
 
-    # Fetch students based on the search query if provided, otherwise get all students
-    if search_query:
-        programs, is_empty = iterator_is_empty(SSIS.get_programs(code=search_query, name=search_query, college=search_query))  # Search by student ID only
+    # Fetch programs based on the search query and selected field if provided
+    if search_query and search_field in ["code", "name", "college"]:
+        filter_kwargs = {search_field: search_query}  # Create a dynamic filter using the selected field
+        programs, is_empty = iterator_is_empty(SSIS.get_programs(**filter_kwargs))
     else:
         programs, is_empty = iterator_is_empty(SSIS.get_programs())
 
@@ -27,7 +29,14 @@ def load_programs():
     # Create a ProgramForm instance with dynamic college choices
     program_form = ProgramForm(college_list=college_choices)
 
-    return render_template('programs_content.html', programs=programs, program_form=program_form, is_empty=is_empty)
+    return render_template(
+        'programs_content.html', 
+        programs=programs, 
+        program_form=program_form, 
+        is_empty=is_empty,
+        search_query=search_query,
+        search_field=search_field
+    )
 
 
 @programs_bp.route('/add', methods=['POST'])
@@ -39,8 +48,8 @@ def add_program():
     
     if form.validate_on_submit():
         new_program = Program(
-            code=form.code.data,
-            name=form.name.data,
+            code=form.code.data.upper(),
+            name=form.name.data.upper(),
             college=form.college.data,
         )
         
@@ -65,8 +74,8 @@ def edit_program() -> Response:
     program = SSIS.get_program(str(form.code.data))
     if program:
         # Update the program with form data
-        program.name = form.name.data
-        program.college = form.college.data
+        program.name = form.name.data.upper()
+        program.college = form.college.data.upper()
         
         try:
             SSIS.edit_program(program)
