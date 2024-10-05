@@ -13,19 +13,22 @@ class StudentForm(FlaskForm):
         validators=[
             validators.DataRequired(),
             validators.Regexp(Student.ID_VALID_REGEX, message="Invalid ID format. Must follow the pattern YYYY-NNNN.")
-        ]
+        ],
+        render_kw={"placeholder": "YYYY-NNNN"}
     )
     firstname = StringField(
         "First Name(s)", 
         validators=[
             validators.DataRequired(message="First name is required.")
-        ]
+        ],
+        render_kw={"placeholder": "e.g. JUAN PONCE, ..."}
     )
     lastname = StringField(
         "Last Name", 
         validators=[
             validators.DataRequired(message="Last name is required.")
-        ]
+        ],
+        render_kw={"placeholder": "e.g. ENRILE, ..."}
     )
     year = SelectField(
         "Year Level", 

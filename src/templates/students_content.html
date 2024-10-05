@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <!-- Search Bar for Filtering Students -->
         <form id="studentSearchForm" method="GET" action="{{ url_for('students.load_students') }}" class="form-inline mb-3">
-            <input type="text" name="search" class="form-control mr-2" placeholder="Search by Student ID">
+            <input type="text" name="search" class="form-control mr-2" placeholder="Search by ID, Name, or Year">
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
         

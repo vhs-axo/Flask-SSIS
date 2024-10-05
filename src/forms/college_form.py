@@ -10,13 +10,15 @@ class CollegeForm(FlaskForm):
         "College Code", 
         validators=[
             validators.DataRequired(message="College Code is required.")
-        ]
+        ],
+        render_kw={"placeholder": "e.g. CCS, COE, ..."}
     )
     name = StringField(
         "College Name", 
         validators=[
             validators.DataRequired(message="College Name is required.")
-        ]
+        ],
+        render_kw={"placeholder": "e.g. COLLEGE OF COMPUTER STUDIES, ..."}
     )
     save = SubmitField("Save")
 

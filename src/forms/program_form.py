@@ -11,13 +11,15 @@ class ProgramForm(FlaskForm):
         "Program Code", 
         validators=[
             validators.DataRequired(message="Program Code is required.")
-        ]
+        ],
+        render_kw={"placeholder": "e.g. BSCS, BAHIS, ..."}
     )
     name = StringField(
         "Program Name", 
         validators=[
             validators.DataRequired(message="Program Name is required.")
-        ]
+        ],
+        render_kw={"placeholder": "e.g. BACHELOR OF SCIENCE IN COMPUTER SCIENCE, ..."}
     )
     college = SelectField(
         "College", 
