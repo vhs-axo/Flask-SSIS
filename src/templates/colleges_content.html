@@ -68,10 +68,10 @@
                     {{ college_form.hidden_tag() }}
                     <div class="form-group">
                         {{ college_form.code.label(class="form-control-label") }}
-                        {{ college_form.code(class="form-control") }}
+                        {{ college_form.code(class="form-control", autocapitalize="characters") }}
                     </div>
                     <div class="form-group">
-                        {{ college_form.name.label(class="form-control-label", autocapitalize="characters" ) }}
+                        {{ college_form.name.label(class="form-control-label") }}
                         {{ college_form.name(class="form-control", autocapitalize="characters") }}
                     </div>
                     <button type="submit" action="{{ url_for('colleges.load_colleges') }}" class="btn btn-primary" id="saveCollegeButton">Save</button>
