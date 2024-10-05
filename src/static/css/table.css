@@ -1,0 +1,8 @@
+.table.sticky th {
+    position: sticky;
+    top: 0
+}
+
+.table-responsive {
+    height: calc(70vh - 25px)
+}

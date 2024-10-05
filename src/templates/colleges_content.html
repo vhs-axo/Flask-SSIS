@@ -1,39 +1,50 @@
 <div class="mt-4" id="collegesTable">
-    <!-- Search Bar for Filtering Colleges -->
-    <form id="collegeSearchForm" method="GET" action="{{ url_for('colleges.load_colleges') }}" class="form-inline mb-3">
-        <input type="text" name="search" class="form-control mr-2" placeholder="Search by Code or Name">
-        <button type="submit" class="btn btn-primary">Search</button>
-    </form>
+    <!-- Container with flexbox utilities for alignment -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Search Bar for Filtering Colleges -->
+        <form id="collegeSearchForm" method="GET" action="{{ url_for('colleges.load_colleges') }}" class="form-inline">
+            <input type="text" name="search" class="form-control mr-2" placeholder="Search by Code or Name" value="{{ search_query }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
 
-    <!-- Button to open the "Add College" form modal -->
-    <button class="btn btn-success mb-3" onclick="showCollegeForm('add')">Add New College</button>
+        <!-- Button to open the "Add College" form modal -->
+        <button class="btn btn-success" onclick="showCollegeForm('add')">Add New College</button>
+    </div>
 
     <!-- Colleges Table -->
-    <table class="table table-bordered table-striped text-center">
-        <thead class="thead-dark">
-            <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for college in colleges %}
-            <tr>
-                <td>{{ college.code }}</td>
-                <td>{{ college.name }}</td>
-                <td>
-                    <button class="btn btn-sm btn-warning" onclick="showCollegeForm('edit', '{{ college.code }}', '{{ college.name }}')">Edit</button>
-                    <form class="delete-college-form" action="{{ url_for('colleges.delete_college') }}" method="POST" style="display:inline;">
-                        {{ college_form.hidden_tag() }}
-                        <input type="hidden" name="code" value="{{ college.code }}">
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this college? This will also delete every program and student under it.')">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-borderless table-striped text-center table-hover sticky">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for college in colleges %}
+                <tr>
+                    <td>{{ college.code }}</td>
+                    <td>{{ college.name }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="showCollegeForm('edit', '{{ college.code }}', '{{ college.name }}')">Edit</button>
+                        <form class="delete-college-form" action="{{ url_for('colleges.delete_college') }}" method="POST" style="display:inline;">
+                            {{ college_form.hidden_tag() }}
+                            <input type="hidden" name="code" value="{{ college.code }}">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this college? This will also delete every program and student under it.')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- No Colleges Found Message -->
+    {% if is_empty %}
+        <div class="alert alert-warning text-center" role="alert">
+            No colleges found.
+        </div>
+    {% endif %}
 </div>
 
 <!-- Modal for Adding/Editing Colleges -->
@@ -131,12 +142,7 @@
                     $('#collegeFormModal').modal('hide');  // Hide the modal after successful submission
                     $('.modal-backdrop').remove();
                     loadColleges();  // Function to reload the colleges table (to be defined)
-                } else {
-                    alert('Error: ' + response.message);
                 }
-            },
-            error: function(xhr, status, error) {
-                alert('Failed to submit form. Error: ' + error);
             }
         });
     });
@@ -180,10 +186,6 @@
                 } else {
                     alert('Error: ' + response.message);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error("Error during form submission:", error);
-                alert("Failed to submit form. Error: " + error);
             }
         });
     });
